@@ -1,7 +1,10 @@
 import sympy as sp
 
 class Vector:
-    def __init__(self,vector):
+    def __init__(self,coords):
+        vector = []
+        for c in coords:
+            vector.append(c)
         self.dim = len(vector)
         self.data = vector
     
