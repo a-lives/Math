@@ -34,8 +34,7 @@ class Vector:
         data = []
         for c1,c2 in zip(fdot,tdot):
             data.append(c2-c1)
-        self.data = data
-        self.dim = len(data)
+        return Vector(data)
 
 class Dot:
     def __init__(self,coord) -> None:
@@ -58,6 +57,4 @@ class Matrix:
     @classmethod
     def from_vector(self,vectors):
         pass
-        
-
     
