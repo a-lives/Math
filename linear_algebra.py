@@ -1,4 +1,3 @@
-from typing import Iterator
 import sympy as sp
 
 class Vector:
@@ -19,7 +18,7 @@ class Vector:
         return Vector(vector)
     
     def __mul__(self,other):
-        pass
+        return sum(a*b for a,b in zip(self,other))
 
     def __iter__(self):
         return iter(self.data)
@@ -28,16 +27,20 @@ class Vector:
         return str(self.data)
     
 class Matrix:
-    def __init__(self):
+    def __init__(self,matrix):
         pass
     
     @classmethod
     def form_vector(self,vectors):
         pass
         
+        
+        
+        
+        
 if __name__ == "__main__":
     x = sp.symbols('x')
     v1 = Vector([1,2,x])
     v2 = Vector([4,5,6])
-    print(v1+v2)
+    print(v1*v2)
     
