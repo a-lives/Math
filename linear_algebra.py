@@ -45,7 +45,7 @@ class Vector:
         data = []
         for c1,c2 in zip(fdot,tdot):
             data.append(c2-c1)
-        return Vector(data)
+        return Vector(*data)
 
 class Dot:
     def __init__(self,*coords) -> None:
@@ -60,7 +60,7 @@ class Dot:
     def __iter__(self):
         return iter(self.coord)
 
-def vetorial_angle(v1:Vector,v2:Vector):
+def vectorial_angle(v1:Vector,v2:Vector):
     return (v1*v2)/(v1.norm()*v2.norm())
     
     
