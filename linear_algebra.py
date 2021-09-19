@@ -1,7 +1,7 @@
 import sympy as sp
 
 class Vector:
-    def __init__(self,coords):
+    def __init__(self,*coords):
         vector = []
         for c in coords:
             vector.append(c)
@@ -28,6 +28,9 @@ class Vector:
     
     def __str__(self) -> str:
         return str(self.data)
+    
+    def __getitem__(self,item):
+        return self.data[item]
     
     def norm(self):
         return sp.sqrt(sum(x**2 for x in self))
@@ -68,4 +71,3 @@ class Matrix:
     @classmethod
     def from_vector(self,vectors):
         pass
-    
