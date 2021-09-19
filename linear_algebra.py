@@ -32,6 +32,11 @@ class Vector:
     def norm(self):
         return sp.sqrt(sum(x**2 for x in self))
     
+    def cross(self,other):
+        return Vector(self[1]*other[2]-self[2]*other[1],
+                      self[2]*other[0]-self[0]*other[2],
+                      self[0]*other[1]-self[1]*other[0],)
+    
     @classmethod
     def from_dot(self,fdot,tdot):
         data = []
