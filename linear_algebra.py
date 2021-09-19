@@ -37,7 +37,10 @@ class Vector:
         return Vector(data)
 
 class Dot:
-    def __init__(self,coord) -> None:
+    def __init__(self,*coords) -> None:
+        coord = []
+        for c in coords:
+            coord.append(c)
         self.coord = coord
         
     def __str__(self) -> str:
