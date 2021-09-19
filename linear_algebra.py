@@ -29,6 +29,24 @@ class Vector:
     def norm(self):
         return sp.sqrt(sum(x**2 for x in self))
     
+    @classmethod
+    def from_dot(self,fdot,tdot):
+        data = []
+        for c1,c2 in zip(fdot,tdot):
+            data.append(c2-c1)
+        self.data = data
+        self.dim = len(data)
+
+class Dot:
+    def __init__(self,coord) -> None:
+        self.coord = coord
+        
+    def __str__(self) -> str:
+        return str(self.coord)
+    
+    def __iter__(self):
+        return iter(self.coord)
+
 def vetorial_angle(v1:Vector,v2:Vector):
     return (v1*v2)/(v1.norm()*v2.norm())
     
@@ -41,13 +59,5 @@ class Matrix:
     def from_vector(self,vectors):
         pass
         
-        
-        
-        
-        
-if __name__ == "__main__":
-    x = sp.symbols('x')
-    v1 = Vector([1,2,x])
-    v2 = Vector([4,5,6])
-    print(vetorial_angle(v1,v2))
+
     
