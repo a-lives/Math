@@ -1,4 +1,5 @@
 import sympy as sp
+import re
 
 class Vector:
     def __init__(self,*coords):
@@ -62,6 +63,37 @@ class Dot:
 
 def vectorial_angle(v1:Vector,v2:Vector):
     return (v1*v2)/(v1.norm()*v2.norm())
+
+
+class DotBox:
+    def __init__(self,dots_name:str,dots_crood:list):
+        """ 
+        dots_name : likes "A B C A1 B1 C1"
+        dots_crood : likes [(0,0,0),(1,2,3)]
+        return a DotBox class
+        You can use xxx['A'] to get dot A
+        """
+        self.dotnames = re.findall(r"[^ ]",dots_name)
+        self.name2crood = dict()
+        for a,b in zip(self.dotnames,dots_crood):
+            self.name2crood[a] = b
+    
+    def __getitem__(self,item):
+        return Dot(*self.name2crood[item])
+
+class VectorBox:
+    def __init__(self,dotbox:DotBox):
+        """ 
+        return a VectorBox class
+        You can use xxx['AB'] to get vector AB
+        """
+        self.dotbox = dotbox
+    
+    def __getitem__(self,item):
+        dotnames = re.findall(r"[A-Z]\d*")
+        fdot = self.dotbox[dotnames[0]]
+        tdot = self.dotbox[dotnames[1]]
+        return Vector.from_dot(fdot,tdot)
     
     
 class Matrix:
