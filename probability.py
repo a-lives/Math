@@ -1,7 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sys   
-sys.setrecursionlimit(10000) 
+
+def multiplicative(a,b):
+    """ 
+    a<=b
+    return a*(a+1)*...*b
+    if a==b :return 1
+    """
+    if a==b:
+        return a
+    else:
+        z = 1
+        for i in range(a,b+1,1):
+            z*=i
+        return z    
 
 def factorial(x:int)->int:
     """ 
@@ -15,15 +27,28 @@ def factorial(x:int)->int:
     else:
         return x*factorial(x-1)
 
-def A(m:int,n:int)->int:
+def A(n:int,m:int)->int:
     """ 
     arrangement
     """
-    return int(factorial(n)/factorial(n-m))
+    if n<=0 or m <0:
+        print("Error:   n:",n,"m:",m)
+        return None
+    if n==m:
+        return factorial(n)
+    elif m==0:
+        return 1
+    else:
+        return multiplicative(n-m+1,n)
 
-def C(m:int,n:int)->int:
+def C(n:int,m:int)->int:
     """ 
     combination
     """
-    return int( factorial(n) / (factorial(m)*factorial(n-m)) )
-
+    if n<=0 or m <0:
+        print("Error:   n:",n,"m:",m)
+        return None
+    if m==0:
+        return 1
+    else:
+        return int(A(n,m)/A(m,m))
