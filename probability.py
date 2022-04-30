@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sympy as sp
 
 def multiplicative(a,b):
     """ 
@@ -52,3 +53,81 @@ def C(n:int,m:int)->int:
         return 1
     else:
         return int(A(n,m)/A(m,m))
+    
+    
+class PBB_Model:
+    """ 
+    LOPD: list of tuple [(x_1,p_1),(x_2,p_2)...]
+    X:X's eval,list
+    P:P's eval,list
+    """
+    def __init__(self,LOPD):
+        self.X = [x[0] for x in LOPD]
+        self.P = [x[1] for x in LOPD]
+        self.LOPD = list(LOPD)
+        
+    def __str__(self) -> str:
+        return str(self.LOPD)
+        
+    def exp(self):
+        """ 期望 """
+        return sum([x*y for x,y in self.LOPD])
+    
+    def var(self):
+        """ 方差 """
+        return sum(x**2*y for x,y in self.LOPD) - self.exp()**2
+    
+    def std(self):
+        """ 标准差 """
+        return sp.sqrt(self.var())
+    
+class BIND(PBB_Model):
+    """ 二项式分布 """
+    def __init__(self,n,p):
+        self.n = n
+        self.p = p
+        self.LOPD = []
+        self.X = []
+        self.P = []
+        for i in range(self.n+1):
+            self.LOPD.append((i , p:=C(self.n,i) * (self.p**i) * ((1-self.p)**(self.n-i)) ))
+            self.X.append(i)
+            self.P.append(p)
+    
+    def exp(self):
+        return self.n*self.p
+    
+    def var(self):
+        return self.n*self.p*(1-self.p)
+    
+class HYPD(PBB_Model):
+    """ 超几何分布 """
+    def __init__(self,N,M,n,acc="symbol"):
+        """
+        acc: "symbol" or an int 
+        """
+        self.N = N
+        self.M = M
+        self.n = n
+        self.m = max(0,self.n-self.N+self.M)
+        self.r = min(self.n,self.M)
+        self.LOPD = []
+        self.X = []
+        self.P = []
+        if acc == "symbol":    
+            for i in range(self.m,self.r+1):
+                self.LOPD.append((i ,p:= sp.Rational(C(self.M,i)*C(self.N-self.M,self.n-i), C(self.N,self.n)) ))
+                self.X.append(i)
+                self.P.append(p)
+        else:
+            for i in range(self.m,self.r+1):
+                self.LOPD.append((i ,p:= sp.Rational(C(self.M,i)*C(self.N-self.M,self.n-i), C(self.N,self.n)).evalf(acc) ))
+                self.X.append(i)
+                self.P.append(p)
+            
+    def exp(self):
+        return self.n * sp.Rational(self.M,self.N)
+        
+        
+    
+
