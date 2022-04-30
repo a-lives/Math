@@ -81,7 +81,18 @@ class PBB_Model:
         """ 标准差 """
         return sp.sqrt(self.var())
     
-class BIND(PBB_Model):
+    def draw(self,type="bar",p_color=None,b_color=None):
+        """ 
+        type: "plot","bar","all"
+        """
+        fig,ax = plt.subplots()
+        if type == "plot" or type =="all":
+            ax.plot(self.X,self.P,color=p_color)
+        if type == "bar" or type =="all":
+            ax.bar(self.X,self.P,color=b_color)
+        return fig
+    
+class BIN_D(PBB_Model):
     """ 二项式分布 """
     def __init__(self,n,p):
         self.n = n
@@ -100,7 +111,7 @@ class BIND(PBB_Model):
     def var(self):
         return self.n*self.p*(1-self.p)
     
-class HYPD(PBB_Model):
+class HYP_D(PBB_Model):
     """ 超几何分布 """
     def __init__(self,N,M,n,acc="symbol"):
         """
