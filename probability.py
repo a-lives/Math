@@ -95,7 +95,7 @@ class PBB_Model:
         if type == "bar" or type =="all":
             ax.bar(self.X,self.P,color=b_color)
         return fig
-#d=BIN_D(100000,1-10e-5,values=(20-500000,20))  
+
 class BIN_D(PBB_Model):
     """ 二项式分布 """
     def __init__(self,n,p,values=(0,1),acc="symbol"):
