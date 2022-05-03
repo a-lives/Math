@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
+from decimal import Decimal
 
 def multiplicative(a,b):
     """ 
@@ -52,7 +53,10 @@ def C(n:int,m:int)->int:
     if m==0:
         return 1
     else:
-        return int(A(n,m)/A(m,m))
+        try:
+            return int(A(n,m)/A(m,m))
+        except:
+            return (A(n,m)//A(m,m))
     
     
 class PBB_Model:
@@ -91,19 +95,32 @@ class PBB_Model:
         if type == "bar" or type =="all":
             ax.bar(self.X,self.P,color=b_color)
         return fig
-    
+#d=BIN_D(100000,1-10e-5,values=(20-500000,20))  
 class BIN_D(PBB_Model):
     """ 二项式分布 """
-    def __init__(self,n,p):
+    def __init__(self,n,p,values=(0,1),acc="symbol"):
+        """ 
+        acc: "symbol" or an int 
+        values: (0,1) or others , 0 ~ p , 1 ~ (1-p)
+        """
         self.n = n
         self.p = p
         self.LOPD = []
         self.X = []
         self.P = []
-        for i in range(self.n+1):
-            self.LOPD.append((i , p:=C(self.n,i) * (self.p**i) * ((1-self.p)**(self.n-i)) ))
-            self.X.append(i)
-            self.P.append(p)
+        if acc == "symbol":
+            for i in range(self.n+1):
+                try:
+                    self.LOPD.append((x:= i*values[1] + (self.n-i)*values[0]  , p:=(C(self.n,i) * (self.p**i) * ((1-self.p)**(self.n-i))) ))
+                except:
+                    self.LOPD.append((x:= i*values[1] + (self.n-i)*values[0]  , p:=(Decimal(C(self.n,i)) * Decimal(self.p**i) * Decimal((1-self.p)**(self.n-i))) ))
+                self.X.append(x)
+                self.P.append(p)
+        else:
+            for i in range(self.n+1):
+                self.LOPD.append((x:= i*values[1] + (self.n-i)*values[0]  , p:=(C(self.n,i) * (self.p**i) * ((1-self.p)**(self.n-i))*sp.Rational(1,1)).evalf(acc) ))
+                self.X.append(x)
+                self.P.append(p)
     
     def exp(self):
         return self.n*self.p
@@ -113,9 +130,10 @@ class BIN_D(PBB_Model):
     
 class HYP_D(PBB_Model):
     """ 超几何分布 """
-    def __init__(self,N,M,n,acc="symbol"):
+    def __init__(self,N,M,n,acc="symbol",values=(0,1)):
         """
         acc: "symbol" or an int 
+        values: (0,1) or others , 0 ~ p , 1 ~ (1-p)
         """
         self.N = N
         self.M = M
@@ -127,18 +145,39 @@ class HYP_D(PBB_Model):
         self.P = []
         if acc == "symbol":    
             for i in range(self.m,self.r+1):
-                self.LOPD.append((i ,p:= sp.Rational(C(self.M,i)*C(self.N-self.M,self.n-i), C(self.N,self.n)) ))
-                self.X.append(i)
+                self.LOPD.append((x:= i*values[1] + (self.n-i)*values[0]  ,p:= sp.Rational(C(self.M,i)*C(self.N-self.M,self.n-i), C(self.N,self.n)) ))
+                self.X.append(x)
                 self.P.append(p)
         else:
             for i in range(self.m,self.r+1):
-                self.LOPD.append((i ,p:= sp.Rational(C(self.M,i)*C(self.N-self.M,self.n-i), C(self.N,self.n)).evalf(acc) ))
-                self.X.append(i)
+                self.LOPD.append((x:= i*values[1] + (self.n-i)*values[0]  ,p:= sp.Rational(C(self.M,i)*C(self.N-self.M,self.n-i), C(self.N,self.n)).evalf(acc) ))
+                self.X.append(x)
                 self.P.append(p)
             
     def exp(self):
         return self.n * sp.Rational(self.M,self.N)
         
         
+class NORM_D:
+    """ 
+    正态分布
+    """
+    def __init__(self,mu,sigma):
+        self.mu = mu
+        self.sigma = sigma
+        self.var = sigma**2
+        self.x = sp.symbols('x')
+        self.E = (1/(sigma*sp.sqrt(2*sp.pi)) ) * sp.E ** -( (self.x-self.mu)**2 / 2*self.var )
+        self.IE = sp.integrate(self.E,self.x)
+    def get_prob(self,ll=None,ul=None,acc=10):
+        if ll == None and ul == None:
+            answer  = 1
+        if ll == None and not ul == None:
+            answer = (self.IE.subs(self.x,ul) + 0.5).evalf(acc)
+        if not ll == None and ul == None:
+            answer = (0.5 - self.IE.subs(self.x,ll)).evalf(acc)
+        if not ll == None and not ul == None:
+            answer = (self.IE.subs(self.x,ul) - self.IE.subs(self.x,ll)).evalf(acc)
+        return answer
     
 
