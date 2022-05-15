@@ -1,10 +1,10 @@
 ﻿import matplotlib.pyplot as plt
 import numpy as np
 import math
-from numpy.core.fromnumeric import size
 from pandas import DataFrame
 import pandas as pd
 from scipy import stats
+import sympy as sp
 np.set_printoptions(suppress=True)
 
 def statistic(data,k=None,gc=None,begin=None,color='#1f77b4',label_color='black',label_size=10,label_digits=2,max_digits=10,show=False):
@@ -80,7 +80,7 @@ def statistic(data,k=None,gc=None,begin=None,color='#1f77b4',label_color='black'
     print(df2)
     print("*"*20)
     #绘图
-    ax = plt.axes()
+    fig,ax = plt.subplots()
     ax.set_xticks(np.arange(begin,nextbegin+k,k))
     ax.hist(data,gc,range=(begin,nextbegin),density=1,color=color)
     # plt.xticks(np.arange(begin,nextbegin+k,k))
@@ -103,8 +103,77 @@ def statistic(data,k=None,gc=None,begin=None,color='#1f77b4',label_color='black'
         ax.text((x[0]+x[1])/2,y/k,label,ha='center',va='bottom',color=label_color,fontsize=label_size)
         
     if show:
-        plt.show()
-        
+        fig.show()
+
+def mean(data,acc=None):
+    """ 
+    均值
+    """
+    if acc != None:
+        return (sp.Rational(1,len(data))*sum(data)).evalf(acc)
+    else:
+        return sp.Rational(1,len(data))*sum(data)
+    
+def var(data,acc=None):
+    """ 
+    方差
+    """
+    data_bar = mean(data)
+    if acc != None:
+        return (sp.Rational(1,len(data))*sum((i-data_bar)**2 for i in data)).evalf(acc)
+    else:
+        return sp.Rational(1,len(data))*sum((i-data_bar)**2 for i in data)
+    
+
+def std(data,acc=None):
+    """ 
+    标准差
+    """
+    if acc !=None:
+        return sp.sqrt(var(data)).evalf(acc)
+    else:
+        return sp.sqrt(var(data))
+
+def r(x,y,acc = None,usenumpy = False):
+    """ 
+    样本相关系数
+    """
+    if usenumpy == False:
+        x_bar = mean(x)
+        y_bar = mean(y)
+        # print(x_bar,y_bar,std(x),std(y))
+        anwser = sum((i-x_bar)*(j-y_bar) for i,j in zip(x,y))/(len(x)*std(x)*std(y))
+        if acc != None:
+            return anwser.evalf(acc)
+        else:
+            return anwser
+    else:
+        x_bar = np.mean(x)
+        y_bar = np.mean(y)
+        # print(x_bar,y_bar,std(x),std(y))
+        anwser = (sum(i*j for i,j in zip(x,y)) - len(x)*x_bar*y_bar)/(len(x)*np.std(x)*np.std(y))
+        return anwser
+    
+def lse(x,y,acc=None,usenumpy = False):
+    """ 
+    一元线性回归方程的参数的最小二乘估计
+    返回a_hat,b_hat
+    """
+    if usenumpy == False:
+        x_bar = mean(x)
+        y_bar = mean(y)
+        b_hat = sum((i-x_bar)*(j-y_bar) for i,j in zip(x,y))/(len(x)*var(x))
+        a_hat = y_bar - b_hat*x_bar
+        if acc != None:
+            return a_hat.evalf(acc),b_hat.evalf(acc)
+        else:
+            return a_hat,b_hat
+    else:
+        x_bar = np.mean(x)
+        y_bar = np.mean(y)
+        b_hat = (sum(i*j for i,j in zip(x,y)) - len(x)*x_bar*y_bar)/(len(x)*np.var(x))
+        a_hat = y_bar - b_hat*x_bar
+        return a_hat,b_hat
 
     
 
@@ -133,3 +202,7 @@ if __name__ == "__main__":
             1301 ,10843,13864,12691,8419 ,14267,9809 ,9858 ,8922 ,12682]
 
     statistic(data,gc=10,label_size=8,show=True)
+    x = [10,20,30,40,50,60,70,80,90,100]
+    y = [62,68,75,81,89,95,102,108,115,122]
+    lse(x,y)
+    print(lse(x,y,acc=10),r(x,y,acc=10))
